@@ -1,0 +1,32 @@
+#headerDiv{
+  display: flex;
+}
+
+#headerLogo{
+  width: 200px;
+}
+
+.statBox{
+  border: thin solid black;
+  padding: 20px;
+  padding-top: 0px;
+  margin: 5px;
+}
+
+.listBox{
+  display: flex;
+}
+
+h3{
+  text-align: center;
+  border-bottom: thin dotted black;
+}
+
+ul{
+  margin-left: -20px;
+  list-style-position: outside;
+}
+
+li{
+  text-align: justify;
+}
