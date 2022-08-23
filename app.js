@@ -1,5 +1,18 @@
 'use strict';
 
+function cookieStore(location, minCust, maxCust,
+  avgCookieCust, openTime, closeTime) {
+
+  self.location = location;
+  self.minCust = minCust;
+  self.maxCust = maxCust;
+  self.avgCookieCust = avgCookieCust;
+  self.openTime = openTime;
+  self.closeTime = closeTime;
+  self.total = 0;
+}
+
+
 let seattleStore = {
   location: 'Seattle',
   minCusHourly: 23,
