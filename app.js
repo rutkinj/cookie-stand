@@ -1,8 +1,9 @@
 'use strict';
 
+////////////////// CONSTRUCTOR ////////////////
 
 function Store(loc, minCust, maxCust,
-  avgCookieCust, openTime, closeTime) {
+  avgCookieCust, openTime = 6, closeTime = 20) {
 
   this.loc = loc;
   this.minCust = minCust;
@@ -15,8 +16,10 @@ function Store(loc, minCust, maxCust,
   this.hoursOfOp = [];
 
   this.populateHoursOfOp();
+  this.estimateDay();
 }
 
+//////////////// PROTOTYPES ///////////////////
 
 Store.prototype.populateHoursOfOp = function (open = 6, close = 20) {
   let isAM = true;
@@ -49,367 +52,95 @@ Store.prototype.estimateDay = function () {
   for (let i = 0; i < this.closeTime - this.openTime; i++) {
     let hourlyTotal = this.estimateHour();
     this.simulatedHourlySales.push(hourlyTotal);
-    this.dailyTotal += hourlyTotal;
+    this.total += hourlyTotal;
   }
   return this.salesHourly;
 };
+Store.prototype.fillRow = function (element, targetId, arrayToWrite) {
+  for (let i = 0; i < arrayToWrite.length; i++) {
+    this.makeWriteAppend(element, targetId, arrayToWrite[i]);
+  }
+};
 
-// Store.prototype.makeRow = function (eleId) {
-
-//   let list = document.getElementById(eleId);
-//   for (let i = 0; i < this.hoursOfOp.length; i++) {
-//     newLiWithInKVStyle(this.hoursOfOp[i], this.salesHourly[i], list);
-//   }
-//   newLiWithInKVStyle('Total', this.dailyTotal, list);
-// };
-
-Store.prototype.makeWriteAppend = function (element, val, target) {
-  let parent = document.getElementById(target);
+Store.prototype.makeWriteAppend = function (element, targetId, val) {
+  let parent = document.getElementById(targetId);
   let li = document.createElement(element);
   li.textContent = val;
   parent.appendChild(li);
 };
 
+Store.prototype.makeNewRow = function (rowId, targetId) {
+  let parent = document.getElementById(targetId);
+  let tr = document.createElement('tr');
+  tr.setAttribute('id',rowId);
+  parent.appendChild(tr);
+};
+
+Store.prototype.render = function() {
+  this.makeNewRow(this.loc, 'table');
+  this.makeWriteAppend('th', this.loc, this.loc);
+  this.fillRow('td', this.loc, this.simulatedHourlySales);
+  this.makeWriteAppend('th', this.loc, this.total);
+};
+
+/////////////// STORES INIT //////////////
+let stores = [];
 let seattle = new Store('Seattle', 23, 65, 6.3, 6, 20);
+let tokyo = new Store('Tokyo', 3, 24, 1.2);
+let dubai = new Store('Dubai', 11, 38, 3.7);
+let paris = new Store('Paris', 20, 38, 2.3);
+let lima = new Store('Lima', 2, 16, 4.6);
+stores.push(seattle, tokyo, dubai, paris, lima);
 
-seattle.makeWriteAppend('tr', 'bingbong?', 'table');
-seattle.makeWriteAppend('th', 'wahwah', 'table');
+//////// TOTALS GARBAGE REFACTOR PLS //////////////
+let totalsByHour = [];
 
-seattle.makeWriteAppend('th', 'wahwah', 'table');
+function calcTotalsByHour(){
+  for (let item of seattle.hoursOfOp){
+    totalsByHour.push(0);
+  }
+  for (let store of stores){
+    for (let i = 0; i < store.simulatedHourlySales.length; i++){
+      totalsByHour[i] += store.simulatedHourlySales[i];
+    }
+  }
+}
 
-seattle.makeWriteAppend('th', 'wahwah', 'table');
-// let tokyo = new Store('Tokyo', 3, 24, 1.2, 6, 20);
+function calcGrandTotal(){
+  let grandTotal = 0;
+  for (let i = 0; i < totalsByHour.length; i++){
+    grandTotal += totalsByHour[i];
+  }
+  return grandTotal;
+}
 
-// let dubai
+calcTotalsByHour();
 
+////////////// TOP/BOTTOM ROWS FUNC ////////////////////
 
+function makeTopRow(){
+  seattle.makeNewRow('times', 'table');
+  seattle.makeWriteAppend('th', 'times', 'Locations');
+  seattle.fillRow('td', 'times', seattle.hoursOfOp);
+  seattle.makeWriteAppend('th', 'times', 'Daily Totals');
+}
 
-// let seattleStore = {
-//   location: 'Seattle',
-//   minCusHourly: 23,
-//   maxCustHourly: 65,
-//   avgCookieCust: 6.3,
-//   // assume military time
-//   openTime:6,
-//   closeTime:20,
-//   salesHourly:[],
-//   dailyTotal:0,
-//   hoursOfOp:[],
+function makeBottomRow(){
+  seattle.makeNewRow('totals', 'table');
+  seattle.makeWriteAppend('th', 'totals', 'Totals');
+  seattle.fillRow('td', 'totals', totalsByHour);
+  seattle.makeWriteAppend('th', 'totals', calcGrandTotal());
+}
 
+///////////// RENDER TABLE /////////////
 
-//   randomRange: function(lo, hi) {
-//     return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-//   },
+makeTopRow();
 
-//   populateHoursOfOp: function(open, close){
-//     this.hoursOfOp = [];
-//     let isAM = true;
-//     for(let i = open; i < close; i++){
-//       let h = i;
-//       if (i === 12){
-//         isAM = false;
-//         h += 12;
-//       }
+seattle.render();
+tokyo.render();
+dubai.render();
+paris.render();
+lima.render();
 
-//       if (isAM){
-//         this.hoursOfOp.push(`${h}am`);
-//       }else{
-//         h -= 12;
-//         this.hoursOfOp.push(`${h}pm`);
-//       }
-//     }
-//     this.salesHourly = this.hoursOfOp;
-//     return this.hoursOfOp;
-//   },
+makeBottomRow();
 
-//   estimateHour: function(){
-//     let custHour = this.randomRange(this.minCusHourly,this.maxCustHourly);
-//     return Math.floor(custHour * this.avgCookieCust);
-//   },
-
-//   estimateDay: function(){
-//     this.salesHourly = [];
-//     for (let i = 0; i < this.closeTime - this.openTime; i++){
-//       let hourlyTotal = this.estimateHour();
-//       this.salesHourly.push(hourlyTotal);
-//       this.dailyTotal += hourlyTotal;
-//     }
-//     return this.salesHourly;
-//   },
-
-//   simulateDay: function(){
-//     this.populateHoursOfOp(this.openTime,this.closeTime);
-//     this.estimateDay();
-//   }
-
-// };
-
-
-
-// let tokyoStore = {
-//   location: 'Tokyo',
-//   minCusHourly: 3,
-//   maxCustHourly: 24,
-//   avgCookieCust: 1.2,
-//   // assume military time
-//   openTime: 6,
-//   closeTime: 20,
-//   salesHourly: [],
-//   dailyTotal: 0,
-//   hoursOfOp: [],
-
-
-//   randomRange: function (lo, hi) {
-//     return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-//   },
-
-//   populateHoursOfOp: function (open, close) {
-//     this.hoursOfOp = [];
-//     let isAM = true;
-//     for (let i = open; i < close; i++) {
-//       let h = i;
-//       if (i === 12) {
-//         isAM = false;
-//         h += 12;
-//       }
-
-//       if (isAM) {
-//         this.hoursOfOp.push(`${h}am`);
-//       } else {
-//         h -= 12;
-//         this.hoursOfOp.push(`${h}pm`);
-//       }
-//     }
-//     this.salesHourly = this.hoursOfOp;
-//     return this.hoursOfOp;
-//   },
-
-//   estimateHour: function () {
-//     let custHour = this.randomRange(this.minCusHourly, this.maxCustHourly);
-//     return Math.floor(custHour * this.avgCookieCust);
-//   },
-
-//   estimateDay: function () {
-//     this.salesHourly = [];
-//     for (let i = 0; i < this.closeTime - this.openTime; i++) {
-//       let hourlyTotal = this.estimateHour();
-//       this.salesHourly.push(hourlyTotal);
-//       this.dailyTotal += hourlyTotal;
-//     }
-//     return this.salesHourly;
-//   },
-
-//   simulateDay: function () {
-//     this.populateHoursOfOp(this.openTime, this.closeTime);
-//     this.estimateDay();
-//   }
-
-// };
-
-
-
-// let dubaiStore = {
-//   location: 'Dubai',
-//   minCusHourly: 11,
-//   maxCustHourly: 38,
-//   avgCookieCust: 3.7,
-//   // assume military time
-//   openTime: 6,
-//   closeTime: 20,
-//   salesHourly: [],
-//   dailyTotal: 0,
-//   hoursOfOp: [],
-
-
-//   randomRange: function (lo, hi) {
-//     return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-//   },
-
-//   populateHoursOfOp: function (open, close) {
-//     this.hoursOfOp = [];
-//     let isAM = true;
-//     for (let i = open; i < close; i++) {
-//       let h = i;
-//       if (i === 12) {
-//         isAM = false;
-//         h += 12;
-//       }
-
-//       if (isAM) {
-//         this.hoursOfOp.push(`${h}am`);
-//       } else {
-//         h -= 12;
-//         this.hoursOfOp.push(`${h}pm`);
-//       }
-//     }
-//     this.salesHourly = this.hoursOfOp;
-//     return this.hoursOfOp;
-//   },
-
-//   estimateHour: function () {
-//     let custHour = this.randomRange(this.minCusHourly, this.maxCustHourly);
-//     return Math.floor(custHour * this.avgCookieCust);
-//   },
-
-//   estimateDay: function () {
-//     this.salesHourly = [];
-//     for (let i = 0; i < this.closeTime - this.openTime; i++) {
-//       let hourlyTotal = this.estimateHour();
-//       this.salesHourly.push(hourlyTotal);
-//       this.dailyTotal += hourlyTotal;
-//     }
-//     return this.salesHourly;
-//   },
-
-//   simulateDay: function () {
-//     this.populateHoursOfOp(this.openTime, this.closeTime);
-//     this.estimateDay();
-//   }
-
-// };
-
-
-
-// let parisStore = {
-//   location: 'Paris',
-//   minCusHourly: 20,
-//   maxCustHourly: 38,
-//   avgCookieCust: 2.3,
-//   // assume military time
-//   openTime: 6,
-//   closeTime: 20,
-//   salesHourly: [],
-//   dailyTotal: 0,
-//   hoursOfOp: [],
-
-
-//   randomRange: function (lo, hi) {
-//     return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-//   },
-
-//   populateHoursOfOp: function (open, close) {
-//     this.hoursOfOp = [];
-//     let isAM = true;
-//     for (let i = open; i < close; i++) {
-//       let h = i;
-//       if (i === 12) {
-//         isAM = false;
-//         h += 12;
-//       }
-
-//       if (isAM) {
-//         this.hoursOfOp.push(`${h}am`);
-//       } else {
-//         h -= 12;
-//         this.hoursOfOp.push(`${h}pm`);
-//       }
-//     }
-//     this.salesHourly = this.hoursOfOp;
-//     return this.hoursOfOp;
-//   },
-
-//   estimateHour: function () {
-//     let custHour = this.randomRange(this.minCusHourly, this.maxCustHourly);
-//     return Math.floor(custHour * this.avgCookieCust);
-//   },
-
-//   estimateDay: function () {
-//     this.salesHourly = [];
-//     for (let i = 0; i < this.closeTime - this.openTime; i++) {
-//       let hourlyTotal = this.estimateHour();
-//       this.salesHourly.push(hourlyTotal);
-//       this.dailyTotal += hourlyTotal;
-//     }
-//     return this.salesHourly;
-//   },
-
-//   simulateDay: function () {
-//     this.populateHoursOfOp(this.openTime, this.closeTime);
-//     this.estimateDay();
-//   }
-
-// };
-
-
-
-// let limaStore = {
-//   location: 'Lima',
-//   minCusHourly: 2,
-//   maxCustHourly: 16,
-//   avgCookieCust: 4.6,
-//   // assume military time
-//   openTime: 6,
-//   closeTime: 20,
-//   salesHourly: [],
-//   dailyTotal: 0,
-//   hoursOfOp: [],
-
-
-//   randomRange: function (lo, hi) {
-//     return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-//   },
-
-//   populateHoursOfOp: function (open, close) {
-//     this.hoursOfOp = [];
-//     let isAM = true;
-//     for (let i = open; i < close; i++) {
-//       let h = i;
-//       if (i === 12) {
-//         isAM = false;
-//         h += 12;
-//       }
-
-//       if (isAM) {
-//         this.hoursOfOp.push(`${h}am`);
-//       } else {
-//         h -= 12;
-//         this.hoursOfOp.push(`${h}pm`);
-//       }
-//     }
-//     this.salesHourly = this.hoursOfOp;
-//     return this.hoursOfOp;
-//   },
-
-//   estimateHour: function () {
-//     let custHour = this.randomRange(this.minCusHourly, this.maxCustHourly);
-//     return Math.floor(custHour * this.avgCookieCust);
-//   },
-
-//   estimateDay: function () {
-//     this.salesHourly = [];
-//     for (let i = 0; i < this.closeTime - this.openTime; i++) {
-//       let hourlyTotal = this.estimateHour();
-//       this.salesHourly.push(hourlyTotal);
-//       this.dailyTotal += hourlyTotal;
-//     }
-//     return this.salesHourly;
-//   },
-
-//   simulateDay: function () {
-//     this.populateHoursOfOp(this.openTime, this.closeTime);
-//     this.estimateDay();
-//   }
-
-// };
-
-// function writeToHTML(obj, eleId){
-//   obj.simulateDay();
-
-//   let list = document.getElementById(eleId);
-//   for (let i = 0; i < obj.hoursOfOp.length; i++) {
-//     newLiWithInKVStyle(obj.hoursOfOp[i], obj.salesHourly[i], list);
-//   }
-//   newLiWithInKVStyle('Total', obj.dailyTotal, list);
-// }
-
-// function newLiWithInKVStyle(key, val, parentList){
-//   let li = document.createElement('li');
-//   li.textContent = `${key}: ${val}`;
-//   parentList.appendChild(li);
-// }
-
-// writeToHTML(seattleStore, 'olSeattle');
-// writeToHTML(tokyoStore, 'olTokyo');
-// writeToHTML(dubaiStore, 'olDubai');
-// writeToHTML(parisStore, 'olParis');
-// writeToHTML(limaStore, 'olLima');
