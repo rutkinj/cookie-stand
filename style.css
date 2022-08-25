@@ -2,6 +2,8 @@
 
 .headerDiv{
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .salesLogo{
@@ -25,49 +27,165 @@
 }
 
 body{
+  display: flex;
+  flex-direction: column;
   background-color: #9E9650;
-  max-width: fit-content;
+  max-width: 960px;
   margin: auto;
 }
+
 header{
   border: 5px double #9E9650;
   background-color: #C9BCBD;
   padding: 20px;
-  margin: 10px;
+  margin: 10px 50px;
 }
+
+sup{
+  font-size: x-small;
+}
+
 main{
-  padding: 10px;
   border: 5px double #CBA065;
   background-color: #C0634A;
   color: #C9BCBD;
+  padding: 15px;
 }
+
 h1{
+  font-size: xx-large;
   font-family: 'Montserrat', sans-serif;
   color: #25251C;
 }
 
+h2{
+  font-size: x-large;
+  margin-bottom: 15px;
+}
+
 h3{
+  padding: 5px;
+  font-size: large;
+  display: block;
   text-align: center;
   border-bottom: thin dotted black;
 }
 
-p{
-  font-family: Georgia, 'Times New Roman', Times, serif;
-}
-
-ul{
-  margin-left: -20px;
-  list-style-position: outside;
-}
-
 li{
-  text-align: justify;
+  padding: 5px;
+}
+
+p, a{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin: 10px;
+}
+
+table{
+  width: 1000px;
+  border: thin solid black;
+}
+
+td{
+  text-align: center;
+  padding: 10px;
+  border: thin solid black;
+}
+
+section{
+  margin: 15px;
+}
+
+.making-cookies{
+  background-color: #C9BCBD;
+  border: 5px double #9E9650;
+  color: #25251C;
+  padding: 15px;
+}
+.making-cookies div{
+  display: flex;
+  justify-content: space-around;
+}
+
+div div{
+  width: 45%;
+  flex-direction: column;
+  align-items: center;
+}
+#cutter{
+  width: 200px;
+  border-radius: 25%;
+}
+
+#frosted{
+  width: 300px;
+  border-radius: 25%;
+}
+
+.locations{
+  color: #25251C;
+  background-color: #CBA065;
+  border: 5px double #C9BCBD;
+  padding: 15px;
+}
+
+.locations div{
+  display: flex;
+  flex-wrap:wrap;
+  justify-content: space-around;
+}
+
+.location{
+  margin-bottom: 10px;
+  background-color: #C0634A;
+  border: 5px double #25251C;
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+}
+.about-pat{
+  color: #25251C;
+  background-color: #9E9650;
+  border: 5px double #CBA065;
+  padding: 25px;
+}
+
+.about-pat h2{
+  display: inline-block;
+  margin-bottom: 15px;
+}
+#shirt{
+  float: right;
+  width: 200px;
+  padding-left: 15px;
+  padding-top: 5px;
+}
+#fam-img{
+  padding-right: 15px;
+  float: left;
+  width: 40%;
 }
 
 footer{
+  padding: 20px;
+  margin: 25px 50px;
   border: 5px double #9E9650;
   background-color: #CBA065;
-  position: fixed;
-  padding: 0px 10px;
-  bottom: 20px;
+}
+
+.footer-div{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+}
+
+#underfoot{
+  align-self: center;
+  overflow:hidden;
+  display: flex;
+  width: 100vw;
+}
+
+#underfoot img{
+  border-top: 5px double #9E9650;
 }
