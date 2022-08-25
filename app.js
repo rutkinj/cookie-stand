@@ -17,9 +17,13 @@ function Store(loc, minCust, maxCust,
 
   this.populateHoursOfOp();
   this.estimateDay();
+  arrOfStores.push(this);
 }
 
 //////////////// PROTOTYPES ///////////////////
+
+Store.prototype.totalsByHour = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+Store.prototype.grandTotal = [0,];
 
 Store.prototype.populateHoursOfOp = function (open = 6, close = 20) {
   let isAM = true;
@@ -52,8 +56,10 @@ Store.prototype.estimateDay = function () {
   for (let i = 0; i < this.closeTime - this.openTime; i++) {
     let hourlyTotal = this.estimateHour();
     this.simulatedHourlySales.push(hourlyTotal);
+    this.totalsByHour[i] += hourlyTotal;
     this.total += hourlyTotal;
   }
+  this.grandTotal[0] += this.total;
   return this.salesHourly;
 };
 Store.prototype.fillRow = function (element, targetId, arrayToWrite) {
@@ -62,10 +68,10 @@ Store.prototype.fillRow = function (element, targetId, arrayToWrite) {
   }
 };
 
-Store.prototype.makeWriteAppend = function (element, targetId, val) {
+Store.prototype.makeWriteAppend = function (element, targetId, content) {
   let parent = document.getElementById(targetId);
   let li = document.createElement(element);
-  li.textContent = val;
+  li.textContent = content;
   parent.appendChild(li);
 };
 
@@ -84,37 +90,36 @@ Store.prototype.render = function() {
 };
 
 /////////////// STORES INIT //////////////
-let stores = [];
+let arrOfStores = [];
 let seattle = new Store('Seattle', 23, 65, 6.3, 6, 20);
 let tokyo = new Store('Tokyo', 3, 24, 1.2);
 let dubai = new Store('Dubai', 11, 38, 3.7);
 let paris = new Store('Paris', 20, 38, 2.3);
 let lima = new Store('Lima', 2, 16, 4.6);
-stores.push(seattle, tokyo, dubai, paris, lima);
 
 //////// TOTALS GARBAGE REFACTOR PLS //////////////
-let totalsByHour = [];
+// let totalsByHour = [];
 
-function calcTotalsByHour(){
-  for (let item of seattle.hoursOfOp){
-    totalsByHour.push(0);
-  }
-  for (let store of stores){
-    for (let i = 0; i < store.simulatedHourlySales.length; i++){
-      totalsByHour[i] += store.simulatedHourlySales[i];
-    }
-  }
-}
+// function calcTotalsByHour(){
+//   for (let item of seattle.hoursOfOp){
+//     totalsByHour.push(0);
+//   }
+//   for (let store of stores){
+//     for (let i = 0; i < store.simulatedHourlySales.length; i++){
+//       totalsByHour[i] += store.simulatedHourlySales[i];
+//     }
+//   }
+// }
 
-function calcGrandTotal(){
-  let grandTotal = 0;
-  for (let i = 0; i < totalsByHour.length; i++){
-    grandTotal += totalsByHour[i];
-  }
-  return grandTotal;
-}
+// function calcGrandTotal(){
+//   let grandTotal = 0;
+//   for (let i = 0; i < Store.totalsByHour.length; i++){
+//     grandTotal += Store.totalsByHour[i];
+//   }
+//   return grandTotal;
+// }
 
-calcTotalsByHour();
+// calcTotalsByHour();
 
 ////////////// TOP/BOTTOM ROWS FUNC ////////////////////
 
@@ -128,8 +133,8 @@ function makeTopRow(){
 function makeBottomRow(){
   seattle.makeNewRow('totals', 'table');
   seattle.makeWriteAppend('th', 'totals', 'Totals');
-  seattle.fillRow('td', 'totals', totalsByHour);
-  seattle.makeWriteAppend('th', 'totals', calcGrandTotal());
+  seattle.fillRow('td', 'totals', seattle.totalsByHour);
+  seattle.makeWriteAppend('th', 'totals', seattle.grandTotal[0]);
 }
 
 ///////////// RENDER TABLE /////////////
