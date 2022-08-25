@@ -45,13 +45,16 @@ Store.prototype.populateHoursOfOp = function (open = 6, close = 20) {
   this.salesHourly = this.hoursOfOp;
   return this.hoursOfOp;
 };
+
 Store.prototype.randomRange = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
 Store.prototype.estimateHour = function (minCust = this.minCust, maxCust = this.maxCust) {
   let custHour = this.randomRange(minCust, maxCust);
   return Math.floor(custHour * this.avgCookieCust);
 };
+
 Store.prototype.estimateDay = function () {
   for (let i = 0; i < this.closeTime - this.openTime; i++) {
     let hourlyTotal = this.estimateHour();
@@ -62,6 +65,7 @@ Store.prototype.estimateDay = function () {
   this.grandTotal[0] += this.total;
   return this.salesHourly;
 };
+
 Store.prototype.fillRow = function (element, targetId, arrayToWrite) {
   for (let i = 0; i < arrayToWrite.length; i++) {
     this.makeWriteAppend(element, targetId, arrayToWrite[i]);
@@ -89,7 +93,10 @@ Store.prototype.render = function() {
   this.makeWriteAppend('th', this.loc, this.total);
 };
 
+/////////////// END PROTO ////////////////
+
 /////////////// STORES INIT //////////////
+
 let arrOfStores = [];
 let seattle = new Store('Seattle', 23, 65, 6.3, 6, 20);
 let tokyo = new Store('Tokyo', 3, 24, 1.2);
@@ -141,11 +148,46 @@ function makeBottomRow(){
 
 makeTopRow();
 
-seattle.render();
-tokyo.render();
-dubai.render();
-paris.render();
-lima.render();
+for (let store of arrOfStores){
+  store.render();
+}
 
 makeBottomRow();
+
+//////////// LISTENER AND FUNCS ///////////
+let formEl = document.getElementById('new-loc-form');
+formEl.addEventListener('submit', handleSubmit);
+
+function handleSubmit(event){
+  event.preventDefault();
+  let newLoc = createAndAddLoc(event.target);
+  newLoc.render();
+  redoBottomRow();
+}
+
+function createAndAddLoc(location){
+  let {locationName, minCustHour, maxCustHour, avgCookieCust} = location;
+  clearDupeRow(locationName.value);
+  let newLoc = new Store(
+    locationName.value,
+    parseInt(minCustHour.value),
+    parseInt(maxCustHour.value),
+    parseInt(avgCookieCust.value));
+  return newLoc;
+}
+
+function clearDupeRow(newLoc){
+  for (let store of arrOfStores){
+    if (newLoc === store.loc){
+      let oldLoc = document.getElementById(store.loc);
+      oldLoc.remove();
+    }
+  }
+}
+
+function redoBottomRow(){
+  let totalsRow = document.getElementById('totals');
+  totalsRow.remove();
+  makeBottomRow();
+}
 
