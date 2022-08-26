@@ -17,13 +17,12 @@ function Store(loc, minCust, maxCust,
 
   this.populateHoursOfOp();
   this.estimateDay();
+
+  this.checkForDupe();
   arrOfStores.push(this);
 }
 
 //////////////// PROTOTYPES ///////////////////
-
-Store.prototype.totalsByHour = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-Store.prototype.grandTotal = [0,];
 
 Store.prototype.populateHoursOfOp = function (open = 6, close = 20) {
   let isAM = true;
@@ -43,6 +42,7 @@ Store.prototype.populateHoursOfOp = function (open = 6, close = 20) {
     }
   }
   this.salesHourly = this.hoursOfOp;
+
   return this.hoursOfOp;
 };
 
@@ -59,10 +59,8 @@ Store.prototype.estimateDay = function () {
   for (let i = 0; i < this.closeTime - this.openTime; i++) {
     let hourlyTotal = this.estimateHour();
     this.simulatedHourlySales.push(hourlyTotal);
-    this.totalsByHour[i] += hourlyTotal;
     this.total += hourlyTotal;
   }
-  this.grandTotal[0] += this.total;
   return this.salesHourly;
 };
 
@@ -93,6 +91,21 @@ Store.prototype.render = function() {
   this.makeWriteAppend('th', this.loc, this.total);
 };
 
+Store.prototype.checkForDupe = function() {
+  for (let store of arrOfStores) {
+    if (this.loc === store.loc) {
+      this.removeDupeHTML(store);
+      arrOfStores.pop(store);
+    }
+  }
+};
+
+Store.prototype.removeDupeHTML = function(store){
+  if (document.getElementById(store.loc)){
+    let oldLoc = document.getElementById(store.loc);
+    oldLoc.remove();
+  }
+};
 /////////////// END PROTO ////////////////
 
 /////////////// STORES INIT //////////////
@@ -105,28 +118,26 @@ let paris = new Store('Paris', 20, 38, 2.3);
 let lima = new Store('Lima', 2, 16, 4.6);
 
 //////// TOTALS GARBAGE REFACTOR PLS //////////////
-// let totalsByHour = [];
+let totalsByHour = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-// function calcTotalsByHour(){
-//   for (let item of seattle.hoursOfOp){
-//     totalsByHour.push(0);
-//   }
-//   for (let store of stores){
-//     for (let i = 0; i < store.simulatedHourlySales.length; i++){
-//       totalsByHour[i] += store.simulatedHourlySales[i];
-//     }
-//   }
-// }
+function calcTotalsByHour(){
+  totalsByHour = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  for (let store of arrOfStores){
+    for (let i = 0; i < store.simulatedHourlySales.length; i++){
+      totalsByHour[i] += store.simulatedHourlySales[i];
+    }
+  }
+}
 
-// function calcGrandTotal(){
-//   let grandTotal = 0;
-//   for (let i = 0; i < Store.totalsByHour.length; i++){
-//     grandTotal += Store.totalsByHour[i];
-//   }
-//   return grandTotal;
-// }
 
-// calcTotalsByHour();
+function calcGrandTotal(){
+  let grandTotal = 0;
+  for (let i = 0; i < totalsByHour.length; i++){
+    grandTotal += totalsByHour[i];
+  }
+  return grandTotal;
+}
+
 
 ////////////// TOP/BOTTOM ROWS FUNC ////////////////////
 
@@ -138,10 +149,11 @@ function makeTopRow(){
 }
 
 function makeBottomRow(){
+  calcTotalsByHour();
   seattle.makeNewRow('totals', 'table');
   seattle.makeWriteAppend('th', 'totals', 'Totals');
-  seattle.fillRow('td', 'totals', seattle.totalsByHour);
-  seattle.makeWriteAppend('th', 'totals', seattle.grandTotal[0]);
+  seattle.fillRow('td', 'totals', totalsByHour);
+  seattle.makeWriteAppend('th', 'totals', calcGrandTotal());
 }
 
 ///////////// RENDER TABLE /////////////
@@ -163,11 +175,11 @@ function handleSubmit(event){
   let newLoc = createAndAddLoc(event.target);
   newLoc.render();
   redoBottomRow();
+  console.log(arrOfStores);
 }
 
 function createAndAddLoc(location){
   let {locationName, minCustHour, maxCustHour, avgCookieCust} = location;
-  clearDupeRow(locationName.value);
   let newLoc = new Store(
     locationName.value,
     parseInt(minCustHour.value),
@@ -176,18 +188,8 @@ function createAndAddLoc(location){
   return newLoc;
 }
 
-function clearDupeRow(newLoc){
-  for (let store of arrOfStores){
-    if (newLoc === store.loc){
-      let oldLoc = document.getElementById(store.loc);
-      oldLoc.remove();
-    }
-  }
-}
-
 function redoBottomRow(){
   let totalsRow = document.getElementById('totals');
   totalsRow.remove();
   makeBottomRow();
 }
-
