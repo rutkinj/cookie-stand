@@ -138,22 +138,44 @@ function calcGrandTotal(){
   return grandTotal;
 }
 
+///////////// GENERIC ROWS FUNCTIONS ///////////////
+
+
+function makeNewThead (rowId, targetId) {
+  let parent = document.getElementById(targetId);
+  let tr = document.createElement('thead');
+  tr.setAttribute('id', rowId);
+  parent.appendChild(tr);
+}
+
+function makeWriteAppend (element, targetId, content) {
+  let parent = document.getElementById(targetId);
+  let li = document.createElement(element);
+  li.textContent = content;
+  parent.appendChild(li);
+}
+
+function fillRow (element, targetId, arrayToWrite) {
+  for (let i = 0; i < arrayToWrite.length; i++) {
+    makeWriteAppend(element, targetId, arrayToWrite[i]);
+  }
+}
 
 ////////////// TOP/BOTTOM ROWS FUNC ////////////////////
 
 function makeTopRow(){
-  seattle.makeNewRow('times', 'table');
-  seattle.makeWriteAppend('th', 'times', 'Locations');
-  seattle.fillRow('td', 'times', seattle.hoursOfOp);
-  seattle.makeWriteAppend('th', 'times', 'Daily Totals');
+  makeNewThead('times', 'table');
+  makeWriteAppend('th', 'times', 'Locations');
+  fillRow('td', 'times', seattle.hoursOfOp);
+  makeWriteAppend('th', 'times', 'Daily Totals');
 }
 
 function makeBottomRow(){
   calcTotalsByHour();
-  seattle.makeNewRow('totals', 'table');
-  seattle.makeWriteAppend('th', 'totals', 'Totals');
-  seattle.fillRow('td', 'totals', totalsByHour);
-  seattle.makeWriteAppend('th', 'totals', calcGrandTotal());
+  makeNewThead('totals', 'table');
+  makeWriteAppend('th', 'totals', 'Totals');
+  fillRow('td', 'totals', totalsByHour);
+  makeWriteAppend('th', 'totals', calcGrandTotal());
 }
 
 ///////////// RENDER TABLE /////////////
