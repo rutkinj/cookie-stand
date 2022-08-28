@@ -64,31 +64,11 @@ Store.prototype.estimateDay = function () {
   return this.salesHourly;
 };
 
-Store.prototype.fillRow = function (element, targetId, arrayToWrite) {
-  for (let i = 0; i < arrayToWrite.length; i++) {
-    this.makeWriteAppend(element, targetId, arrayToWrite[i]);
-  }
-};
-
-Store.prototype.makeWriteAppend = function (element, targetId, content) {
-  let parent = document.getElementById(targetId);
-  let li = document.createElement(element);
-  li.textContent = content;
-  parent.appendChild(li);
-};
-
-Store.prototype.makeNewRow = function (rowId, targetId) {
-  let parent = document.getElementById(targetId);
-  let tr = document.createElement('tr');
-  tr.setAttribute('id',rowId);
-  parent.appendChild(tr);
-};
-
 Store.prototype.render = function() {
-  this.makeNewRow(this.loc, 'table');
-  this.makeWriteAppend('th', this.loc, this.loc);
-  this.fillRow('td', this.loc, this.simulatedHourlySales);
-  this.makeWriteAppend('th', this.loc, this.total);
+  makeNewRow(this.loc, 'table');
+  makeWriteAppend('th', this.loc, this.loc);
+  fillRow('td', this.loc, this.simulatedHourlySales);
+  makeWriteAppend('th', this.loc, this.total);
 };
 
 Store.prototype.checkForDupe = function() {
@@ -140,6 +120,12 @@ function calcGrandTotal(){
 
 ///////////// GENERIC ROWS FUNCTIONS ///////////////
 
+function makeNewRow(rowId, targetId) {
+  let parent = document.getElementById(targetId);
+  let tr = document.createElement('tr');
+  tr.setAttribute('id', rowId);
+  parent.appendChild(tr);
+};
 
 function makeNewThead (rowId, targetId) {
   let parent = document.getElementById(targetId);
